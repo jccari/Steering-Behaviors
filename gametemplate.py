@@ -30,11 +30,12 @@ class GameTemplate(object):
         pygame.mouse.set_cursor(*pygame.cursors.diamond)
         self.gameobjects = []
         self.gamestates = {}
-        self.gamestates["init"] = ["running", "seek", "flee", "wander"]
-        self.gamestates["running"] = ["seek", "flee", "wander", "quit"]
-        self.gamestates["seek"] = ["running", "flee", "wander", "quit"]
-        self.gamestates["flee"] = ["seek", "running", "wander", "quit"]
-        self.gamestates["wander"] = ["seek", "flee", "running", "quit"]
+        self.gamestates["init"] = ["running", "seek", "flee", "wander", "flock"]
+        self.gamestates["running"] = ["seek", "flee", "wander", "quit", "flock"]
+        self.gamestates["seek"] = ["running", "flee", "wander", "quit", "flock"]
+        self.gamestates["flee"] = ["seek", "running", "wander", "quit", "flock"]
+        self.gamestates["wander"] = ["seek", "flee", "running", "quit", "flock"]
+        self.gamestates["flock"] = ["seek", "flee", "running", "wander", "quit"]
         self.gamestates["quit"] = []
         self.currentstate = "init"
         self.events = pygame.event.get()
@@ -44,14 +45,17 @@ class GameTemplate(object):
     def set_state(self, value):
         """Set state."""
         if value in self.gamestates[self.currentstate]:
-            print "Valid Transition", self.currentstate, " -> ", value
+            print("Valid Transition", self.currentstate, " -> ", value)
             self.currentstate = value
         else:
-            print "Invalid Transition ", self.currentstate, " -> ", value
+            print("Invalid Transition ", self.currentstate, " -> ", value)
 
     def get_state(self):
         """Get currentstate."""
         return self.currentstate
+
+    def get_gameobjects(self):
+        return self.gameobjects
 
     def startup(self):
         """Do startup routines."""
@@ -82,6 +86,7 @@ class GameTemplate(object):
                         i.indwander = False
                         i.indflee = False
                         i.indseek = True if not i.indseek else False
+                        i.inFlock = False
 
                 if key_pressed[pygame.K_F2]:
                     if self.get_state() is "flee":
@@ -92,6 +97,7 @@ class GameTemplate(object):
                         i.indseek = False
                         i.indwander = False
                         i.indflee = True if not i.indflee else False
+                        i.inFlock = False
 
                 if key_pressed[pygame.K_F3]:
                     if self.get_state() is "wander":
@@ -102,6 +108,7 @@ class GameTemplate(object):
                         i.indflee = False
                         i.indseek = False
                         i.indwander = True if not i.indwander else False
+                        i.inFlock = False
 
                 if key_pressed[pygame.K_F4]:
                     self.set_state("running")
@@ -109,6 +116,14 @@ class GameTemplate(object):
                         i.indflee = False
                         i.indseek = False
                         i.indwander = False
+                        i.inFlock = False
+                if key_pressed[pygame.K_F5]:
+                    self.set_state("flock")
+                    for i in self.gameobjects:
+                        i.indflee = False
+                        i.indseek = False
+                        i.indwander = False
+                        i.inFlock = True
 
             if event.type == pygame.QUIT:
                 self.set_state("quit")

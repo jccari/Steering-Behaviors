@@ -44,6 +44,9 @@ class SteeringBehavior(GameTemplate):
         if self.get_state() == "wander":
             for i in self.gameobjects:
                 i.update(self.deltatime)
+        if self.get_state() == "flock":
+            for i in self.gameobjects:
+                i.update(self.deltatime)
         return True
 
     def draw(self):

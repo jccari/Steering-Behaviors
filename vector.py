@@ -41,6 +41,13 @@ class Vector2(object):
         """Override index."""
         return self.value[key]
 
+    def divideBy(self, number):
+        return Vector2(self.xpos / number, self.ypos/ number)
+
+    def get_distance(self, another):
+        tmp = math.pow(self.xpos - another.xpos, 2) + math.pow(self.ypos - another.ypos, 2)
+        return math.sqrt(tmp)
+
     @property
     def magnitude(self):
         """Magnitude."""
@@ -63,6 +70,9 @@ class Vector2(object):
         """Multiply vector to vector."""
         return Vector2(self.xpos * other, self.ypos * other)
 
+    def __str__(self):
+        return "x: %s, y: %s" % (self.xpos, self. ypos)
+
     @property
     def direction(self):
         """Direction."""
@@ -79,8 +89,18 @@ class Vector2(object):
         """Get_dist."""
         return (vector2.xpos - vector1.xpos, vector2.ypos - vector1.ypos)
 
+    def normalize(self):
+        return self.get_direction()
+
+    def normalize2(self, max_value):
+        if self.get_mag() > max_value:
+            new = self.direction * max_value
+            self.setx(new.xpos)
+            self.sety(new.ypos)
+
+
 
 if __name__ == '__main__':
     testv = Vector2(-25, -25)
 
-    print testv * 20
+    print (testv * 20)

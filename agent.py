@@ -17,7 +17,7 @@ random.seed()
 class Agent(object):
     """Agent_list."""
 
-    def __init__(self, position):
+    def __init__(self, position, game):
         """Initialize."""
         self.pos = position
         self.velocity = Vec2(0, 0)
@@ -37,6 +37,9 @@ class Agent(object):
         self.indseek = False
         self.indflee = False
         self.indwander = False
+        self.inFlock = False
+        self.limitFlock = 300
+        self.game = game
 
     def set_target(self, target):
         """Set Target."""
@@ -71,6 +74,98 @@ class Agent(object):
         self.wanderforce = center_circle + displacement
         return self.wanderforce
 
+    def get_velocity(self):
+        return self.velocity
+    
+    def get_position(self):
+        return self.pos
+
+    def distanceFrom(self, another):
+        another_pos = another.get_position()
+        return self.get_position().get_distance(another_pos)
+    
+    def get_random_target(self):
+        xpos = random.randint(0, SCREEN.get_width())
+        ypos = random.randint(0, SCREEN.get_height())
+        return Vec2(xpos, ypos)
+
+    def goal(self):
+        # TODO: maybe needs to generate random target after X secs
+        target = self.get_random_target()
+        return (target - self.get_position()).divideBy(50)
+
+    def separation(self):
+        limit = self.limitFlock /2
+        desiredSep = Vec2(0, 0)
+        neighborCount = 0
+        
+        for agent in self.game.get_gameobjects():
+            if (agent != self):
+                if (self.distanceFrom(agent) < limit):
+                    desiredSep = desiredSep + agent.get_velocity()
+                    neighborCount = neighborCount + 1
+
+        if (neighborCount == 0):
+            return desiredSep
+        
+        desiredSep.divideBy(neighborCount)
+        return desiredSep.normalize()
+        
+
+    def alignment(self):
+        limit = self.limitFlock /2
+        desiredSep = Vec2(0, 0)
+        neighborCount = 0
+        
+        for agent in self.game.get_gameobjects():
+            if (agent != self):
+                if (self.distanceFrom(agent) < limit):
+                    desiredSep = desiredSep + agent.get_position()
+                    neighborCount = neighborCount + 1
+
+        if (neighborCount == 0):
+            return desiredSep
+        
+        desiredSep.divideBy(neighborCount)
+        res = desiredSep - self.get_position()
+        return res.normalize()
+
+    def cohesion(self):
+        limit = self.limitFlock /2
+        desiredSep = Vec2(0, 0)
+        neighborCount = 0
+        
+        for agent in self.game.get_gameobjects():
+            if (agent != self):
+                if (self.distanceFrom(agent) < limit):
+                    desiredSep = desiredSep + ( agent.get_position() - self.get_position())
+                    neighborCount = neighborCount + 1
+
+        if (neighborCount == 0):
+            return desiredSep
+        
+        desiredSep.divideBy(neighborCount)
+        res = desiredSep - self.get_position()
+        res = res * -1
+        return res.normalize()
+
+    def flocking(self):
+        aligment = self.alignment()
+        cohesion = self.cohesion()
+        separation = self.separation()
+        target = self.goal()
+
+        all_forces = aligment + cohesion + separation + target
+
+        # print("*************************")
+        # print("aligment: ", aligment)
+        # print("cohesion: ", cohesion)
+        # print("separation: ", separation)
+        # print("target: ", target)
+        # print("all_forces: ", all_forces)
+        return all_forces
+
+
     def draw(self, screen):
         """Draw the gameobject."""
         middle = Vec2(self.pos.xpos + self.surface.get_width() / 2,
@@ -102,11 +197,11 @@ class Agent(object):
         surfacev = self.font.render(velpos, True, (0, 0, 0))
         screen.blit(surfacev, (self.pos.xpos - 50, self.pos.ypos + 70))
 
-        howpos = "Steering Behavior created by Williams, Donray"
+        howpos = "Steering Behavior created by Williams, Donray - modified by jccari"
         surfaceh = self.font.render(howpos, True, (0, 0, 0))
         screen.blit(surfaceh, (screen.get_width() / 2 + 10, 30))
 
-        inspos = "F1 = Seek / F2 = Flee / F3 = Wander / F4 = All"
+        inspos = "F1 = Seek / F2 = Flee / F3 = Wander / F4 = All / F5 = Flock"
         surfaceh = self.font.render(inspos, True, (0, 0, 0))
         screen.blit(surfaceh, (screen.get_width() / 2 + 10, 40))
 
@@ -119,13 +214,17 @@ class Agent(object):
 
     def update(self, deltatime):
         """Update agent logic."""
+        # print(self.indseek, self.indflee, self.indwander, self.inFlock)
         if self.indseek is True:
             self.force = self.seek(self.targetpos)
         elif self.indflee is True:
             self.force = self.flee(self.targetpos)
         elif self.indwander is True:
             self.force = self.wander(250, 250)
+        elif self.inFlock is True:
+            self.force = self.flocking()
         elif self.indseek is False or self.indflee is False or self.indwander is False:
+            # print("entra")
             self.force = self.seek(
                 self.targetpos) * 25 + self.flee(self.targetpos) + self.wander(100, 100)
 
@@ -145,6 +244,7 @@ class Agent(object):
             self.velocity = self.velocity.direction * self.max_velocity
 
         self.direction = self.velocity.direction
+        # print("velocity2: ", self.velocity)
         self.pos += self.velocity * deltatime
 
 
