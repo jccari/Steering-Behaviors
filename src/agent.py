@@ -5,8 +5,8 @@ import random
 
 import pygame
 
-from constants import *
-from vector import Vector2 as Vec2
+from src.constants import *
+from src.vector import Vector2 as Vec2
 
 random.seed()
 

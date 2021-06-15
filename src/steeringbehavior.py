@@ -4,8 +4,8 @@ import random
 
 import pygame
 
-from constants import *
-from gametemplate import GameTemplate
+from src.constants import *
+from src.gametemplate import GameTemplate
 
 
 class SteeringBehavior(GameTemplate):

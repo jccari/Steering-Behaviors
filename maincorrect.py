@@ -2,10 +2,10 @@
 
 import random
 
-from agent import Agent
-from constants import *
-from steeringbehavior import SteeringBehavior
-from vector import Vector2
+from src.agent import Agent
+from src.constants import *
+from src.steeringbehavior import SteeringBehavior
+from src.vector import Vector2
 
 random.seed()
 

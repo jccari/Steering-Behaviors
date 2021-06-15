@@ -5,8 +5,8 @@ import random
 
 import pygame
 
-from agent import Agent
-from constants import *
+from src.agent import Agent
+from src.constants import *
 
 random.seed()
 # pylint: disable=E1121
