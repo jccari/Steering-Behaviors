@@ -1,3 +1,30 @@
 # Steering-Behaviors
 Implementation of Steering Behaviours.
-To run the program download then double click on play.bat
+
+## Requirements
+1. git
+2. virtualenv
+
+## Installation
+1. Clone this repository
+```
+git clone https://github.com/jccari/Steering-Behaviors.git
+```
+2. Install and activate virtual enviroment
+
+    On linux:
+    ```
+    virtualenv -p python3 venv
+    source venv/bin/activate
+    ```
+
+    On Windows:
+    ```
+    virtualenv -p python3 venv
+    .\venv\Scripts\activate
+    ```
+
+## Run 
+```
+python main.py
+```
