@@ -23,7 +23,11 @@ git clone https://github.com/jccari/Steering-Behaviors.git
     virtualenv -p python3 venv
     .\venv\Scripts\activate
     ```
-
+    
+3.  Install project requirements
+```
+pip install -r requirements.txt
+```
 ## Run 
 ```
 python main.py
